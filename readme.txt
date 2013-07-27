@@ -3,8 +3,8 @@ Contributors: hereswhatidid
 Donate link: http://hereswhatidid.com/contact/
 Tags: jquery autocomplete, jquery ui, themeroller, search, autocomplete, ajax
 Requires at least: 3.x
-Tested up to: 3.5.1
-Stable tag: 2.0.2
+Tested up to: 3.5.2
+Stable tag: 2.1.0
 
 SearchAutocomplete implements the jQuery UI Autocomplete functionality on your Wordpress installation. 
 
@@ -56,6 +56,21 @@ Yes, but it's recommended that you create a copy of the theme that you are going
 Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for support. Thanks!
 
 == Change log ==
+
+= 2.1.0 - 26 Jul 2013
+* Added new passed parameter to the title and url filters that contains information about the current term or post (id, type, taxonomy, posttype)
+
+= 2.0.6 - 24 Jul 2013 =
+* Fixed bug with taxonomy/post order was being ignored
+* Fixed bug Taxonomy type options being ignored
+
+= 2.0.5 - 17 Jul 2013 =
+* Fixed bug with minLength being ignored
+
+= 2.0.4 - 10 Jun 2013 =
+* Fixed bug with ThemeRoller dropdown generation
+* Fixed bug with Taxonomy searches that left blank titles in the dropdown
+* Add ability to style the matching characters in the dropdown
 
 = 2.0.2 - 1 Jun 2013 =
 * Fixed bug with saving settings and no post types are selected

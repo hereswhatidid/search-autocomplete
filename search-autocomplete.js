@@ -5,6 +5,11 @@
 			'maxRows': 10,
 			'minLength': 4,
 		}, SearchAutocomplete);
+
+		options.fieldName = $('<div />').html(options.fieldName).text();
+
+		
+
 		$(options.fieldName).autocomplete({
 			source: function( request, response ) {
 			    $.ajax({
@@ -28,7 +33,7 @@
 			        }
 			    });
 			},
-			minLength: 2,
+			minLength: options.minLength,
 			search: function(event, ui) {
 				$(event.currentTarget).addClass('sa_searching');
 			},
@@ -38,6 +43,16 @@
 				location = ui.item.url;
 			},
 			open: function(event, ui) {
+				var acData = $(this).data('uiAutocomplete');
+				acData
+						.menu
+						.element
+						.find('a')
+						.each(function () {
+							var me = $(this);
+							var keywords = acData.term.split(' ').join('|');
+							me.html(me.text().replace(new RegExp("(" + keywords + ")", "gi"), '<span class="sa-found-text">$1</span>'));
+						});
 				$(event.target).removeClass('sa_searching');
 			},
 			close: function() {

@@ -1,0 +1,9 @@
+# SVN Files
+.svn/
+assets/
+branches/
+tags/
+trunk/
+
+# Mixture
+mixture.json
