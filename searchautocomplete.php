@@ -3,7 +3,7 @@
  * Plugin Name: Search Autocomplete
  * Plugin URI: http://hereswhatidid.com/search-autocomplete/
  * Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
- * Version: 2.1.0
+ * Version: 2.1.1
  * Author: Gabe Shackle
  * Author URI: http://hereswhatidid.com
  * License: GPLv2 or later
@@ -16,6 +16,22 @@ class SearchAutocomplete {
 		'autocomplete_search_id'          => '#s',
 		'autocomplete_minimum'            => 3,
 		'autocomplete_numrows'            => 10,
+		'autocomplete_hotlinks'			  => array(),
+		'autocomplete_hotlink_titles'     => 1,
+		'autocomplete_hotlink_keywords'   => 1,
+		'autocomplete_hotlink_categories' => 1,
+		'autocomplete_posttypes'          => array(),
+		'autocomplete_taxonomies'         => array(),
+		'autocomplete_sortorder'          => 'posts',
+		'autocomplete_exclusions'					=> '',
+		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
+		'autocomplete_custom_theme'       => '',
+	);
+	protected static $options_init = array(
+		'autocomplete_search_id'          => '#s',
+		'autocomplete_minimum'            => 3,
+		'autocomplete_numrows'            => 10,
+		'autocomplete_hotlinks'			  => array( 'posts', 'taxonomies' ),
 		'autocomplete_hotlink_titles'     => 1,
 		'autocomplete_hotlink_keywords'   => 1,
 		'autocomplete_hotlink_categories' => 1,
@@ -58,11 +74,13 @@ class SearchAutocomplete {
 			wp_enqueue_style( 'SearchAutocomplete-theme', plugins_url( 'css' . $this->options['autocomplete_theme'], __FILE__ ), array(), '1.9.2' );
 		}
 		if ( wp_script_is( 'jquery-ui-autocomplete', 'registered' ) ) {
-			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			// wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
 		}
 		else {
 			wp_register_script( 'jquery-ui-autocomplete', plugins_url( 'js/jquery-ui-1.9.2.custom.min.js', __FILE__ ), array( 'jquery-ui' ), '1.9.2', true );
-			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			// wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
 		}
 		wp_localize_script( 'SearchAutocomplete', 'SearchAutocomplete', $localVars );
 	}
@@ -100,8 +118,12 @@ class SearchAutocomplete {
 				);
 				$linkTitle = apply_filters( 'the_title', $post->post_title );
 				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
-				$linkURL = get_permalink( $post->ID );
-				$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL, $tempObject );
+				if ( ! in_array( 'posts', $this->options['autocomplete_hotlinks'] ) ) {
+					$linkURL = '#';
+				} else {
+					$linkURL = get_permalink( $post->ID );
+					$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL, $tempObject );
+				}
 				$resultsPosts[] = array(
 					'title' => $linkTitle,
 					'url'   => $linkURL,
@@ -126,8 +148,12 @@ class SearchAutocomplete {
 				);
 				$linkTitle = apply_filters( 'the_title', $term->post_title );
 				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
-				$linkURL = get_term_link( $term->guid, $term->taxonomy );
-				$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL, $tempObject );
+				if ( ! in_array( 'taxonomies', $this->options['autocomplete_hotlinks'] ) ) {
+					$linkURL = '#';
+				} else {
+					$linkURL = get_term_link( $term->guid, $term->taxonomy );
+					$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL, $tempObject );
+				}
 				$resultsTerms[] = array(
 					'title' => $linkTitle,
 					'url'   => $linkURL,
@@ -283,12 +309,11 @@ class SearchAutocomplete {
 
 	public function sa_settings_field_hotlinks() {
 		?>
-
 		<p><label>
-				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlink_titles]" type="checkbox" id="autocomplete_hotlink_titles" value="1" <?php checked( $this->options['autocomplete_hotlink_titles'], 1 ); ?>>
+				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlinks][]" type="checkbox" id="autocomplete_hotlink_posts" value="posts" <?php checked( in_array( 'posts', $this->options['autocomplete_hotlinks'] ) ); ?>>
 				<?php _e( 'Link to post or page.', 'seach-autocomplete' ); ?></label><br>
 			<label>
-				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlink_keywords]" type="checkbox" id="autocomplete_hotlink_keywords" value="1" <?php checked( $this->options['autocomplete_hotlink_keywords'], 1 ); ?>>
+				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlinks][]" type="checkbox" id="autocomplete_hotlink_taxonomies" value="taxonomies" <?php checked( in_array( 'taxonomies', $this->options['autocomplete_hotlinks'] ) ); ?>>
 				<?php _e( 'Link to taxonomy (categories, keywords, custom taxonomies, etc...) page.', 'search-autocomplete' ); ?>
 			</label></p>
 		<p class="description"><?php _e( 'Adjusts the click action on drop down items.', 'search-autocomplete' ); ?></p>
@@ -374,6 +399,13 @@ class SearchAutocomplete {
 		$valid = wp_parse_args( $input, self::$options_default );
 		return $valid;
 	}
+
+	public function activate( $network_wide ) {
+		if ( get_option( 'sa_settings' ) === false ) {
+			update_option( 'sa_settings', $this->options_init );
+		}
+	}
 }
+register_activation_hook( __FILE__, array( 'SearchAutocomplete', 'activate' ) );
 
 $SearchAutocomplete = new SearchAutocomplete();

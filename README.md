@@ -46,6 +46,9 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.1 - 29 Jul 2013
+* Fixed bug with hotlinking options not saving
+
 #### 2.1.0 - 26 Jul 2013
 * Added new passed parameter to the title and url filters that contains information about the current term or post (id, type, taxonomy, posttype)
 

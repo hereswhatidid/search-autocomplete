@@ -40,7 +40,11 @@
 			create: function() {
 			},
 			select: function( event, ui ) {
-				location = ui.item.url;
+				if ( ui.item.url !== '#' ) {
+					location = ui.item.url;
+				} else {
+					return true;
+				}
 			},
 			open: function(event, ui) {
 				var acData = $(this).data('uiAutocomplete');
