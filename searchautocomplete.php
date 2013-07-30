@@ -402,7 +402,7 @@ class SearchAutocomplete {
 
 	public function activate( $network_wide ) {
 		if ( get_option( 'sa_settings' ) === false ) {
-			update_option( 'sa_settings', $this->options_init );
+			update_option( 'sa_settings', self::$options_init );
 		}
 	}
 }
