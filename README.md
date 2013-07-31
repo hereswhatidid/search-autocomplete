@@ -46,6 +46,9 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.2 - 30 Jul 2013
+* Fixed bug with js file path
+
 #### 2.1.1 - 29 Jul 2013
 * Fixed bug with hotlinking options not saving
 
