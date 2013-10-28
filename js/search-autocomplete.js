@@ -34,6 +34,7 @@
 			    });
 			},
 			minLength: options.minLength,
+            position:{collision:"flipfit"},
 			search: function(event, ui) {
 				$(event.currentTarget).addClass('sa_searching');
 			},
