@@ -309,7 +309,7 @@ class SearchAutocomplete {
 		?>
 		<p><label>
 				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlinks][]" type="checkbox" id="autocomplete_hotlink_posts" value="posts" <?php checked( in_array( 'posts', $this->options['autocomplete_hotlinks'] ) ); ?>>
-				<?php _e( 'Link to post or page.', 'seach-autocomplete' ); ?></label><br>
+				<?php _e( 'Link to post or page.', 'search-autocomplete' ); ?></label><br>
 			<label>
 				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlinks][]" type="checkbox" id="autocomplete_hotlink_taxonomies" value="taxonomies" <?php checked( in_array( 'taxonomies', $this->options['autocomplete_hotlinks'] ) ); ?>>
 				<?php _e( 'Link to taxonomy (categories, keywords, custom taxonomies, etc...) page.', 'search-autocomplete' ); ?>
