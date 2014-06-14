@@ -3,7 +3,7 @@
  * Plugin Name: Search Autocomplete
  * Plugin URI: http://hereswhatidid.com/search-autocomplete/
  * Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
- * Version: 2.0.6
+ * Version: 2.1.0
  * Author: Gabe Shackle
  * Author URI: http://hereswhatidid.com
  * License: GPLv2 or later
@@ -92,10 +92,16 @@ class SearchAutocomplete {
 				'post_type'   => $this->options['autocomplete_posttypes'],
 			) );
 			foreach ( $tempPosts as $post ) {
+				$tempObject = array(
+					'id' => $post->ID,
+					'type' => 'post',
+					'taxonomy' => null,
+					'postType' => $post->post_type
+				);
 				$linkTitle = apply_filters( 'the_title', $post->post_title );
-				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle );
+				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
 				$linkURL = get_permalink( $post->ID );
-				$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL );
+				$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL, $tempObject );
 				$resultsPosts[] = array(
 					'title' => $linkTitle,
 					'url'   => $linkURL,
@@ -104,7 +110,7 @@ class SearchAutocomplete {
 		}
 		if ( count( $this->options['autocomplete_taxonomies'] ) > 0 ) {
 			$taxonomyTypes = "AND ( tax.taxonomy = '" . implode( "' OR tax.taxonomy = '", $this->options['autocomplete_taxonomies'] ) . "') ";
-			$queryStringTaxonomies = 'SELECT term.name as post_title, term.slug as guid, tax.taxonomy, 0 AS content_frequency, 0 AS title_frequency FROM ' . $wpdb->term_taxonomy . ' tax ' .
+			$queryStringTaxonomies = 'SELECT term.term_id as id, term.name as post_title, term.slug as guid, tax.taxonomy, 0 AS content_frequency, 0 AS title_frequency FROM ' . $wpdb->term_taxonomy . ' tax ' .
 					'LEFT JOIN ' . $wpdb->terms . ' term ON term.term_id = tax.term_id WHERE 1 = 1 ' .
 					'AND term.name LIKE "%' . $term . '%" ' .
 					$taxonomyTypes .
@@ -112,11 +118,16 @@ class SearchAutocomplete {
 					'LIMIT 0, ' . $this->options['autocomplete_numrows'];
 			$tempTerms             = $wpdb->get_results( $queryStringTaxonomies );
 			foreach ( $tempTerms as $term ) {
-
+				$tempObject = array(
+					'id' => $term->id,
+					'type' => 'taxonomy',
+					'taxonomy' => $term->taxonomy,
+					'postType' => null
+				);
 				$linkTitle = apply_filters( 'the_title', $term->post_title );
-				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle );
+				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
 				$linkURL = get_term_link( $term->guid, $term->taxonomy );
-				$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL );
+				$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL, $tempObject );
 				$resultsTerms[] = array(
 					'title' => $linkTitle,
 					'url'   => $linkURL,
