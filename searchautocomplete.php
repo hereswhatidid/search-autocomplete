@@ -3,7 +3,7 @@
  * Plugin Name: Search Autocomplete
  * Plugin URI: http://hereswhatidid.com/search-autocomplete/
  * Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
- * Version: 2.1.2
+ * Version: 2.1.1
  * Author: Gabe Shackle
  * Author URI: http://hereswhatidid.com
  * License: GPLv2 or later
@@ -74,11 +74,13 @@ class SearchAutocomplete {
 			wp_enqueue_style( 'SearchAutocomplete-theme', plugins_url( 'css' . $this->options['autocomplete_theme'], __FILE__ ), array(), '1.9.2' );
 		}
 		if ( wp_script_is( 'jquery-ui-autocomplete', 'registered' ) ) {
-			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			// wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
 		}
 		else {
 			wp_register_script( 'jquery-ui-autocomplete', plugins_url( 'js/jquery-ui-1.9.2.custom.min.js', __FILE__ ), array( 'jquery-ui' ), '1.9.2', true );
-			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			// wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
 		}
 		wp_localize_script( 'SearchAutocomplete', 'SearchAutocomplete', $localVars );
 	}
@@ -309,7 +311,7 @@ class SearchAutocomplete {
 		?>
 		<p><label>
 				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlinks][]" type="checkbox" id="autocomplete_hotlink_posts" value="posts" <?php checked( in_array( 'posts', $this->options['autocomplete_hotlinks'] ) ); ?>>
-				<?php _e( 'Link to post or page.', 'search-autocomplete' ); ?></label><br>
+				<?php _e( 'Link to post or page.', 'seach-autocomplete' ); ?></label><br>
 			<label>
 				<input name="<?php echo self::$options_field; ?>[autocomplete_hotlinks][]" type="checkbox" id="autocomplete_hotlink_taxonomies" value="taxonomies" <?php checked( in_array( 'taxonomies', $this->options['autocomplete_hotlinks'] ) ); ?>>
 				<?php _e( 'Link to taxonomy (categories, keywords, custom taxonomies, etc...) page.', 'search-autocomplete' ); ?>
@@ -400,13 +402,7 @@ class SearchAutocomplete {
 
 	public function activate( $network_wide ) {
 		if ( get_option( 'sa_settings' ) === false ) {
-			update_option( 'sa_settings', self::$options_init );
-		} else {
-			$options = get_option( 'sa_settings' );
-			if ( ! isset( $options['autocomplete_hotlinks'] ) ) {
-				$options['autocomplete_hotlinks'] = array( 'posts', 'taxonomies' );
-				update_option( 'sa_settings', $options );
-			}
+			update_option( 'sa_settings', $this->options_init );
 		}
 	}
 }
