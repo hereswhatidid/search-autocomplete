@@ -3,8 +3,8 @@ Contributors: hereswhatidid
 Donate link: http://hereswhatidid.com/contact/
 Tags: jquery autocomplete, jquery ui, themeroller, search, autocomplete, ajax
 Requires at least: 3.x
-Tested up to: 3.5.1
-Stable tag: trunk
+Tested up to: 3.5.2
+Stable tag: 2.0.5
 
 SearchAutocomplete implements the jQuery UI Autocomplete functionality on your Wordpress installation. 
 
@@ -56,6 +56,9 @@ Yes, but it's recommended that you create a copy of the theme that you are going
 Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for support. Thanks!
 
 == Change log ==
+
+= 2.0.5 - 17 Jul 2013 =
+* Fixed bug with minLength being ignored
 
 = 2.0.4 - 10 Jun 2013 =
 * Fixed bug with ThemeRoller dropdown generation
