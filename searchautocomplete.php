@@ -3,7 +3,7 @@
  * Plugin Name: Search Autocomplete
  * Plugin URI: http://hereswhatidid.com/search-autocomplete/
  * Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
- * Version: 2.0.5
+ * Version: 2.0.6
  * Author: Gabe Shackle
  * Author URI: http://hereswhatidid.com
  * License: GPLv2 or later
@@ -96,16 +96,18 @@ class SearchAutocomplete {
 				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle );
 				$linkURL = get_permalink( $post->ID );
 				$linkURL = apply_filters( 'search_autocomplete_modify_url', $linkURL );
-				$resultsTerms[] = array(
+				$resultsPosts[] = array(
 					'title' => $linkTitle,
 					'url'   => $linkURL,
 				);
 			}
 		}
 		if ( count( $this->options['autocomplete_taxonomies'] ) > 0 ) {
+			$taxonomyTypes = "AND ( tax.taxonomy = '" . implode( "' OR tax.taxonomy = '", $this->options['autocomplete_taxonomies'] ) . "') ";
 			$queryStringTaxonomies = 'SELECT term.name as post_title, term.slug as guid, tax.taxonomy, 0 AS content_frequency, 0 AS title_frequency FROM ' . $wpdb->term_taxonomy . ' tax ' .
 					'LEFT JOIN ' . $wpdb->terms . ' term ON term.term_id = tax.term_id WHERE 1 = 1 ' .
 					'AND term.name LIKE "%' . $term . '%" ' .
+					$taxonomyTypes .
 					'ORDER BY tax.count DESC ' .
 					'LIMIT 0, ' . $this->options['autocomplete_numrows'];
 			$tempTerms             = $wpdb->get_results( $queryStringTaxonomies );

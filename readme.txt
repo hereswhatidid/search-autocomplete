@@ -4,7 +4,7 @@ Donate link: http://hereswhatidid.com/contact/
 Tags: jquery autocomplete, jquery ui, themeroller, search, autocomplete, ajax
 Requires at least: 3.x
 Tested up to: 3.5.2
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 
 SearchAutocomplete implements the jQuery UI Autocomplete functionality on your Wordpress installation. 
 
@@ -56,6 +56,10 @@ Yes, but it's recommended that you create a copy of the theme that you are going
 Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for support. Thanks!
 
 == Change log ==
+
+= 2.0.6 - 24 Jul 2013 =
+* Fixed bug with taxonomy/post order was being ignored
+* Fixed bug Taxonomy type options being ignored
 
 = 2.0.5 - 17 Jul 2013 =
 * Fixed bug with minLength being ignored
