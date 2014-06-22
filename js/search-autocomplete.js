@@ -8,8 +8,6 @@
 
 		options.fieldName = $('<div />').html(options.fieldName).text();
 
-		
-
 		$(options.fieldName).autocomplete({
 			source: function( request, response ) {
 			    $.ajax({
@@ -17,7 +15,7 @@
 			        dataType: "json",
 			        data: {
 			        	action: 'autocompleteCallback',
-			            term: $(options.fieldName).val()
+			            term: this.term
 			        },
 			        success: function( data ) {
 			            response( $.map( data.results, function( item ) {
