@@ -1,0 +1,15 @@
+{
+  "name": "search-autocomplete",
+  "version": "2.1.3",
+  "author": "Gabe Shackle <gabe@hereswhatidid.com>",
+  "homepage": "http://hereswhatidid.com/search-autocomplete/",
+  "engines": {
+    "node": ">= 0.10.29"
+  },
+  "dependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-uglify": "~0.5.0",
+    "grunt-contrib-watch": "~0.6.1"
+  }
+}

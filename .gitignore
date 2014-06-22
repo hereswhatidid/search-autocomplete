@@ -4,6 +4,8 @@ assets/
 branches/
 tags/
 trunk/
+node_modules/
+.DS_Store
 
 # Mixture
 mixture.json
