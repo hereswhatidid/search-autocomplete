@@ -8,8 +8,6 @@
 
 		options.fieldName = $('<div />').html(options.fieldName).text();
 
-		
-
 		$(options.fieldName).autocomplete({
 			source: function( request, response ) {
 			    $.ajax({
@@ -17,7 +15,7 @@
 			        dataType: "json",
 			        data: {
 			        	action: 'autocompleteCallback',
-			            term: $(options.fieldName).val()
+			            term: this.term
 			        },
 			        success: function( data ) {
 			            response( $.map( data.results, function( item ) {
@@ -53,9 +51,9 @@
 						.element
 						.find('a')
 						.each(function () {
-							var me = $(this);
-							var keywords = acData.term.split(' ').join('|');
-							me.html(me.text().replace(new RegExp("(" + keywords + ")", "gi"), '<span class="sa-found-text">$1</span>'));
+							var $self = $( this ),
+								keywords = $.trim( acData.term ).split( ' ' ).join('|');
+							$self.html($self.text().replace(new RegExp("(" + keywords + ")", "gi"), '<span class="sa-found-text">$1</span>'));
 						});
 				$(event.target).removeClass('sa_searching');
 			},
