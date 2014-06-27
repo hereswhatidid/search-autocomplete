@@ -48,6 +48,7 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 #### 2.1.3 - 26 Jun 2014
 * Fixed bug with spaces in search string affecting special characters - props to http://www.michaelbrentecklund.com/
+* Fixed bug with multiple matching Autocomplete fields - props to https://github.com/marpa
 
 #### 2.1.2 - 30 Jul 2013
 * Fixed bug with js file path
