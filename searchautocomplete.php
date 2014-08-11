@@ -10,9 +10,10 @@ Author URI: http://hereswhatidid.com
 License: GPLv2 or later
 */
 class SearchAutocomplete {
-	protected static $options_field = "sa_settings";
-	protected static $options_field_ver = "sa_settings_ver";
-	protected static $options_field_current_ver = "2.0";
+	protected static $options_field = 'sa_settings';
+	protected static $options_field_ver = 'sa_settings_ver';
+	protected static $options_field_current_ver = '2.0';
+	protected static $slug = 'search-autocomplete';
 	protected static $options_default = array(
 		'autocomplete_search_id'          => '#s',
 		'autocomplete_minimum'            => 3,
@@ -24,7 +25,10 @@ class SearchAutocomplete {
 		'autocomplete_posttypes'          => array(),
 		'autocomplete_taxonomies'         => array(),
 		'autocomplete_sortorder'          => 'posts',
-		'autocomplete_exclusions'					=> '',
+		'autocomplete_exclusions'		  => '',
+		'autocomplete_position'           => 'bottom left',
+		'autocomplete_delay'              => 500,
+		'autocomplete_autofocus'          => 'false',
 		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
@@ -39,7 +43,10 @@ class SearchAutocomplete {
 		'autocomplete_posttypes'          => array(),
 		'autocomplete_taxonomies'         => array(),
 		'autocomplete_sortorder'          => 'posts',
-		'autocomplete_exclusions'					=> '',
+		'autocomplete_exclusions'		  => '',
+		'autocomplete_position'           => '',
+		'autocomplete_delay'              => 500,
+		'autocomplete_autofocus'          => 'false',
 		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
@@ -84,6 +91,9 @@ class SearchAutocomplete {
 			wp_register_script( 'jquery-ui-autocomplete', plugins_url( 'js/jquery-ui-1.9.2.custom.min.js', __FILE__ ), array( 'jquery-ui' ), '1.9.2', true );
 			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
 		}
+
+		$localVars = apply_filters( 'search_autocomplete_settings', $localVars );
+
 		wp_localize_script( 'SearchAutocomplete', 'SearchAutocomplete', $localVars );
 	}
 
@@ -184,7 +194,6 @@ class SearchAutocomplete {
 	public function settingsPage() {
 		?>
 		<div class="wrap searchautocomplete-settings">
-			<?php screen_icon(); ?>
 			<h2><?php _e( "Search Autocomplete", "search-autocomplete" ); ?></h2>
 
 			<form action="options.php" method="post">
@@ -211,69 +220,94 @@ class SearchAutocomplete {
 		);
 		add_settings_section(
 			'sa_settings_main',
-			__( 'Settings', 'search-autocomplete' ),
+			__( 'Settings', self::$slug ),
 			array( $this, 'sa_settings_main_text' ),
 			'search-autocomplete'
 		);
 		add_settings_field(
 			'autocomplete_search_id',
-			__( 'Search Field Selector', 'search-autocomplete' ),
+			__( 'Search Field Selector', self::$slug ),
 			array( $this, 'sa_settings_field_selector' ),
 			'search-autocomplete',
 			'sa_settings_main'
 		);
 		add_settings_field(
 			'autocomplete_minimum',
-			__( 'Autocomplete Trigger', 'search-autocomplete' ),
+			__( 'Autocomplete Trigger', self::$slug ),
 			array( $this, 'sa_settings_field_minimum' ),
 			'search-autocomplete',
 			'sa_settings_main'
 		);
 		add_settings_field(
 			'autocomplete_numrows',
-			__( 'Number of Results', 'search-autocomplete' ),
+			__( 'Number of Results', self::$slug ),
 			array( $this, 'sa_settings_field_numrows' ),
 			'search-autocomplete',
 			'sa_settings_main'
 		);
+
+		add_settings_field(
+			'autocomplete_delay',
+			__( 'Autocomplete Delay', self::$slug ),
+			array( $this, 'sa_settings_field_delay' ),
+			'search-autocomplete',
+			'sa_settings_main'
+		);
+
+		add_settings_field(
+			'autocomplete_position',
+			__( 'Autocomplete Position', self::$slug ),
+			array( $this, 'sa_settings_field_position' ),
+			'search-autocomplete',
+			'sa_settings_main'
+		);
+
+		add_settings_field(
+			'autocomplete_autofocus',
+			__( 'Autofocus', self::$slug ),
+			array( $this, 'sa_settings_field_autofocus' ),
+			'search-autocomplete',
+			'sa_settings_main'
+		);
+
 		add_settings_field(
 			'autocomplete_hotlinks',
-			__( 'Hotlink Items', 'search-autocomplete' ),
+			__( 'Hotlink Items', self::$slug ),
 			array( $this, 'sa_settings_field_hotlinks' ),
 			'search-autocomplete',
 			'sa_settings_main'
 		);
 		add_settings_field(
 			'autocomplete_posttypes',
-			__( 'Post Types', 'search-autocomplete' ),
+			__( 'Post Types', self::$slug ),
 			array( $this, 'sa_settings_field_posttypes' ),
 			'search-autocomplete',
 			'sa_settings_main'
 		);
 		add_settings_field(
 			'autocomplete_taxonomies',
-			__( 'Taxonomies', 'search-autocomplete' ),
+			__( 'Taxonomies', self::$slug ),
 			array( $this, 'sa_settings_field_taxonomies' ),
 			'search-autocomplete',
 			'sa_settings_main'
 		);
 //		add_settings_field(
 //			'autocomplete_exclusions',
-//			__( 'Excluded ', 'search-autocomplete' ),
+//			__( 'Excluded ', self::$slug ),
 //			array( $this, 'sa_settings_field_exclusions' ),
 //			'search-autocomplete',
 //			'sa_settings_main'
 //		);
 		add_settings_field(
 			'autocomplete_sortorder',
-			__( 'Order of Types', 'search-autocomplete' ),
+			__( 'Order of Types', self::$slug ),
 			array( $this, 'sa_settings_field_sortorder' ),
 			'search-autocomplete',
 			'sa_settings_main'
 		);
 		add_settings_field(
 			'autocomplete_theme',
-			__( 'Theme Stylesheet', 'search-autocomplete' ),
+			__( 'Theme Stylesheet', self::$slug ),
 			array( $this, 'sa_settings_field_themes' ),
 			'search-autocomplete',
 			'sa_settings_main'
@@ -306,6 +340,40 @@ class SearchAutocomplete {
 		?>
 		<input id="autocomplete_numrows" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_numrows]" value="<?php echo $this->options['autocomplete_numrows']; ?>">
 		<p class="description"><?php _e( "The total number of results returned.", "search-autocomplete" ); ?><br>
+	<?php
+	}
+
+	public function sa_settings_field_delay() {
+		?>
+		<input id="autocomplete_delay" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_delay]" value="<?php echo $this->options['autocomplete_delay']; ?>">
+		<p class="description"><?php _e( 'The delay in milliseconds between when a keystroke occurs and when a search is performed.', self::$slug ); ?><br>
+	<?php
+	}
+
+	public function sa_settings_field_autofocus() {
+		?>
+		<select name="autocomplete_focus" id="autocomplete_autofocus">
+			<option value="true" <?php selected( $this->options['autocomplete_autofocus'], 'true' ); ?>><?php _e( 'True', self::$slug ); ?></option>
+			<option value="false" <?php selected( $this->options['autocomplete_autofocus'], 'false' ); ?>><?php _e( 'False', self::$slug ); ?></option>
+		</select>
+		<p class="description"><?php _e( 'If set to true the first item will automatically be focused when the menu is shown.', self::$slug ); ?><br>
+	<?php
+	}
+
+	public function sa_settings_field_position() {
+		$position = explode( ' ', $this->options['autocomplete_position'] );
+		?>
+		<label for="autocomplete_position_vertical"><?php _e( 'Vertical Position', self::$slug ); ?></label>
+		<select name="autocomplete_position_vertical" id="autocomplete_position_vertical">
+			<option value="top" <?php selected( $position[0], 'top' ); ?>><?php _e( 'Top', self::$slug ); ?></option>
+			<option value="bottom" <?php selected( $position[0], 'bottom' ); ?>><?php _e( 'Bottom', self::$slug ); ?></option>
+		</select><br>
+		<label for="autocomplete_position_horizontal"><?php _e( 'Horizontal Position', self::$slug ); ?></label>
+		<select name="autocomplete_position_horizontal" id="autocomplete_position_horizontal">
+			<option value="left" <?php selected( $position[1], 'left' ); ?>><?php _e( 'Left', self::$slug ); ?></option>
+			<option value="right" <?php selected( $position[1], 'right' ); ?>><?php _e( 'Right', self::$slug ); ?></option>
+		</select><br>
+		<p class="description"><?php _e( 'If set to true the first item will automatically be focused when the menu is shown.', self::$slug ); ?><br>
 	<?php
 	}
 

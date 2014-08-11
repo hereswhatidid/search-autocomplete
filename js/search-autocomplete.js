@@ -3,7 +3,7 @@
 		var options = $.extend({
 			'fieldName': '#s',
 			'maxRows': 10,
-			'minLength': 4,
+			'minLength': 4
 		}, SearchAutocomplete);
 
 		options.fieldName = $('<div />').html(options.fieldName).text();
