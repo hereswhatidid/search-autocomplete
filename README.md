@@ -46,6 +46,10 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.5 - 1 Oct 2014
+* Fixed but with WPML installations
+* Added support for delay and autoFocus options
+
 #### 2.1.4 - 27 Jun 2014
 * Ticking version to sync repos
 

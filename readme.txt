@@ -3,8 +3,8 @@ Contributors: hereswhatidid
 Donate link: http://hereswhatidid.com/contact/
 Tags: jquery autocomplete, jquery ui, themeroller, search, autocomplete, ajax
 Requires at least: 3.x
-Tested up to: 3.9.1
-Stable tag: 2.1.4
+Tested up to: 4.0.0
+Stable tag: 2.1.5
 
 SearchAutocomplete implements the jQuery UI Autocomplete functionality on your Wordpress installation. 
 
@@ -56,6 +56,10 @@ Yes, but it's recommended that you create a copy of the theme that you are going
 Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for support. Thanks!
 
 == Change log ==
+
+= 2.1.5 - 1 Oct 2014
+* Fixed but with WPML installations
+* Added support for delay and autoFocus options
 
 = 2.1.4 - 27 Jun 2014
 * Ticking version to sync up repos
