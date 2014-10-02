@@ -118,12 +118,20 @@ class SearchAutocomplete {
 		$resultsTerms = array();
 		$term         = sanitize_text_field( $_GET['term'] );
 		if ( count( $this->options['autocomplete_posttypes'] ) > 0 ) {
-			$tempPosts = get_posts( array(
-				'suppress_filters' => false,
-				's'                => $term,
-				'numberposts'      => $this->options['autocomplete_numrows'],
-				'post_type'        => $this->options['autocomplete_posttypes'],
-			) );
+		if (function_exists("relevanssi_do_query") ) {
+            		$query->query_vars['s'] = $term;
+            		$query->query_vars['posts_per_page'] = $this->options['autocomplete_numrows'];
+            		$query->query_vars['post_type'] = $this->options['autocomplete_posttypes'];
+            		relevanssi_do_query($query);
+            		$tempPosts = $query->posts;    }
+        	else {
+        		 $tempPosts = get_posts( array(
+			'suppress_filters' => false,
+                	's'           => $term,
+                	'numberposts' => $this->options['autocomplete_numrows'],
+                	'post_type'   => $this->options['autocomplete_posttypes'],
+            	) );
+        	}
 			foreach ( $tempPosts as $post ) {
 				$tempObject = array(
 					'id'       => $post->ID,
