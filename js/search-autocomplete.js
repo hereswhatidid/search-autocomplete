@@ -3,7 +3,7 @@
 		var options = $.extend({
 			'fieldName': '#s',
 			'maxRows': 10,
-			'minLength': 4,
+			'minLength': 4
 		}, SearchAutocomplete);
 
 		options.fieldName = $('<div />').html(options.fieldName).text();
@@ -31,7 +31,9 @@
 			        }
 			    });
 			},
+			delay: options.delay,
 			minLength: options.minLength,
+			autoFocus: ( options.autoFocus === 'true' ),
 			search: function(event, ui) {
 				$(event.currentTarget).addClass('sa_searching');
 			},

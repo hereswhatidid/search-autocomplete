@@ -4,27 +4,32 @@
 Plugin Name: Search Autocomplete
 Plugin URI: http://hereswhatidid.com/search-autocomplete/
 Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
-Version: 2.1.4
+Version: 2.1.5
 Author: Gabe Shackle
 Author URI: http://hereswhatidid.com
 License: GPLv2 or later
 */
+
 class SearchAutocomplete {
-	protected static $options_field = "sa_settings";
-	protected static $options_field_ver = "sa_settings_ver";
-	protected static $options_field_current_ver = "2.0";
+	protected static $options_field = 'sa_settings';
+	protected static $options_field_ver = 'sa_settings_ver';
+	protected static $options_field_current_ver = '2.0';
+	protected static $slug = 'search-autocomplete';
 	protected static $options_default = array(
 		'autocomplete_search_id'          => '#s',
 		'autocomplete_minimum'            => 3,
 		'autocomplete_numrows'            => 10,
-		'autocomplete_hotlinks'			  => array(),
+		'autocomplete_hotlinks'           => array(),
 		'autocomplete_hotlink_titles'     => 1,
 		'autocomplete_hotlink_keywords'   => 1,
 		'autocomplete_hotlink_categories' => 1,
 		'autocomplete_posttypes'          => array(),
 		'autocomplete_taxonomies'         => array(),
 		'autocomplete_sortorder'          => 'posts',
-		'autocomplete_exclusions'					=> '',
+		'autocomplete_exclusions'         => '',
+		'autocomplete_position'           => 'bottom left',
+		'autocomplete_delay'              => 500,
+		'autocomplete_autofocus'          => 'false',
 		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
@@ -32,14 +37,17 @@ class SearchAutocomplete {
 		'autocomplete_search_id'          => '#s',
 		'autocomplete_minimum'            => 3,
 		'autocomplete_numrows'            => 10,
-		'autocomplete_hotlinks'			  => array( 'posts', 'taxonomies' ),
+		'autocomplete_hotlinks'           => array( 'posts', 'taxonomies' ),
 		'autocomplete_hotlink_titles'     => 1,
 		'autocomplete_hotlink_keywords'   => 1,
 		'autocomplete_hotlink_categories' => 1,
 		'autocomplete_posttypes'          => array(),
 		'autocomplete_taxonomies'         => array(),
 		'autocomplete_sortorder'          => 'posts',
-		'autocomplete_exclusions'					=> '',
+		'autocomplete_exclusions'         => '',
+		'autocomplete_position'           => '',
+		'autocomplete_delay'              => 500,
+		'autocomplete_autofocus'          => 'false',
 		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
@@ -62,7 +70,7 @@ class SearchAutocomplete {
 	public function initVariables() {
 		$this->pluginUrl = plugin_dir_url( __FILE__ );
 
-		$options         = get_option( self::$options_field );
+		$options       = get_option( self::$options_field );
 		$this->options = ( $options !== false ) ? wp_parse_args( $options, self::$options_default ) : self::$options_default;
 
 		$this->script_mode = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.dev' : '.min';
@@ -72,18 +80,22 @@ class SearchAutocomplete {
 		$localVars = array(
 			'ajaxurl'   => admin_url( 'admin-ajax.php' ),
 			'fieldName' => $this->options['autocomplete_search_id'],
-			'minLength' => $this->options['autocomplete_minimum']
+			'minLength' => $this->options['autocomplete_minimum'],
+			'delay' => $this->options['autocomplete_delay'],
+			'autoFocus' => $this->options['autocomplete_autofocus']
 		);
 		if ( $this->options['autocomplete_theme'] !== '--None--' ) {
 			wp_enqueue_style( 'SearchAutocomplete-theme', plugins_url( 'css' . $this->options['autocomplete_theme'], __FILE__ ), array(), '1.9.2' );
 		}
 		if ( wp_script_is( 'jquery-ui-autocomplete', 'registered' ) ) {
 			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete' . $this->script_mode . '.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
-		}
-		else {
+		} else {
 			wp_register_script( 'jquery-ui-autocomplete', plugins_url( 'js/jquery-ui-1.9.2.custom.min.js', __FILE__ ), array( 'jquery-ui' ), '1.9.2', true );
 			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
 		}
+
+		$localVars = apply_filters( 'search_autocomplete_settings', $localVars );
+
 		wp_localize_script( 'SearchAutocomplete', 'SearchAutocomplete', $localVars );
 	}
 
@@ -107,19 +119,20 @@ class SearchAutocomplete {
 		$term         = sanitize_text_field( $_GET['term'] );
 		if ( count( $this->options['autocomplete_posttypes'] ) > 0 ) {
 			$tempPosts = get_posts( array(
-				's'           => $term,
-				'numberposts' => $this->options['autocomplete_numrows'],
-				'post_type'   => $this->options['autocomplete_posttypes'],
+				'suppress_filters' => false,
+				's'                => $term,
+				'numberposts'      => $this->options['autocomplete_numrows'],
+				'post_type'        => $this->options['autocomplete_posttypes'],
 			) );
 			foreach ( $tempPosts as $post ) {
 				$tempObject = array(
-					'id' => $post->ID,
-					'type' => 'post',
+					'id'       => $post->ID,
+					'type'     => 'post',
 					'taxonomy' => null,
 					'postType' => $post->post_type
 				);
-				$linkTitle = apply_filters( 'the_title', $post->post_title );
-				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
+				$linkTitle  = apply_filters( 'the_title', $post->post_title );
+				$linkTitle  = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
 				if ( ! in_array( 'posts', $this->options['autocomplete_hotlinks'] ) ) {
 					$linkURL = '#';
 				} else {
@@ -133,23 +146,23 @@ class SearchAutocomplete {
 			}
 		}
 		if ( count( $this->options['autocomplete_taxonomies'] ) > 0 ) {
-			$taxonomyTypes = "AND ( tax.taxonomy = '" . implode( "' OR tax.taxonomy = '", $this->options['autocomplete_taxonomies'] ) . "') ";
+			$taxonomyTypes         = "AND ( tax.taxonomy = '" . implode( "' OR tax.taxonomy = '", $this->options['autocomplete_taxonomies'] ) . "') ";
 			$queryStringTaxonomies = 'SELECT term.term_id as id, term.name as post_title, term.slug as guid, tax.taxonomy, 0 AS content_frequency, 0 AS title_frequency FROM ' . $wpdb->term_taxonomy . ' tax ' .
-					'LEFT JOIN ' . $wpdb->terms . ' term ON term.term_id = tax.term_id WHERE 1 = 1 ' .
-					'AND term.name LIKE "%' . $term . '%" ' .
-					$taxonomyTypes .
-					'ORDER BY tax.count DESC ' .
-					'LIMIT 0, ' . $this->options['autocomplete_numrows'];
+			                         'LEFT JOIN ' . $wpdb->terms . ' term ON term.term_id = tax.term_id WHERE 1 = 1 ' .
+			                         'AND term.name LIKE "%' . $term . '%" ' .
+			                         $taxonomyTypes .
+			                         'ORDER BY tax.count DESC ' .
+			                         'LIMIT 0, ' . $this->options['autocomplete_numrows'];
 			$tempTerms             = $wpdb->get_results( $queryStringTaxonomies );
 			foreach ( $tempTerms as $term ) {
 				$tempObject = array(
-					'id' => $term->id,
-					'type' => 'taxonomy',
+					'id'       => $term->id,
+					'type'     => 'taxonomy',
 					'taxonomy' => $term->taxonomy,
 					'postType' => null
 				);
-				$linkTitle = apply_filters( 'the_title', $term->post_title );
-				$linkTitle = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
+				$linkTitle  = apply_filters( 'the_title', $term->post_title );
+				$linkTitle  = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
 				if ( ! in_array( 'taxonomies', $this->options['autocomplete_hotlinks'] ) ) {
 					$linkURL = '#';
 				} else {
@@ -164,8 +177,7 @@ class SearchAutocomplete {
 		}
 		if ( $this->options['autocomplete_sortorder'] == 'posts' ) {
 			$results = array_merge( $resultsPosts, $resultsTerms );
-		}
-		else {
+		} else {
 			$results = array_merge( $resultsTerms, $resultsPosts );
 		}
 		$results = apply_filters( 'search_autocomplete_modify_results', $results );
@@ -178,23 +190,28 @@ class SearchAutocomplete {
 	 *
 	 */
 	public function adminSettingsMenu() {
-		$page = add_options_page( 'Search Autocomplete', 'Search Autocomplete', 'manage_options', 'search-autocomplete', array( $this, 'settingsPage' ) );
+		$page = add_options_page(
+			__( 'Search Autocomplete', 'search-autocomplete' ),
+			__( 'Search Autocomplete', 'search-autocomplete' ),
+			'manage_options',
+			'search-autocomplete', array(
+				$this,
+				'settingsPage'
+			) );
 	}
 
 	public function settingsPage() {
 		?>
 		<div class="wrap searchautocomplete-settings">
-			<?php screen_icon(); ?>
-			<h2><?php _e( "Search Autocomplete", "search-autocomplete" ); ?></h2>
-
+			<h2><?php _e( 'Search Autocomplete', 'search-autocomplete' ); ?></h2>
 			<form action="options.php" method="post">
 				<?php wp_nonce_field(); ?>
 				<?php
-				settings_fields( "sa_settings" );
-				do_settings_sections( "search-autocomplete" );
+				settings_fields( 'sa_settings' );
+				do_settings_sections( 'search-autocomplete' );
 				?>
-				<input class="button-primary" name="Submit" type="submit" value="<?php _e( "Save settings", "search-autocomplete" ); ?>">
-				<input class="button revert" name="revert" type="button" value="<?php _e( "Revert to Defaults", "search-autocomplete" ); ?>">
+				<input class="button-primary" name="Submit" type="submit" value="<?php _e( 'Save settings', 'search-autocomplete' ); ?>">
+				<input class="button revert" name="revert" type="button" value="<?php _e( 'Revert to Defaults', 'search-autocomplete' ); ?>">
 			</form>
 		</div>
 	<?php
@@ -207,7 +224,7 @@ class SearchAutocomplete {
 		register_setting(
 			self::$options_field,
 			self::$options_field,
-			array( $this, "sa_settings_validate" )
+			array( $this, 'sa_settings_validate' )
 		);
 		add_settings_section(
 			'sa_settings_main',
@@ -236,6 +253,31 @@ class SearchAutocomplete {
 			'search-autocomplete',
 			'sa_settings_main'
 		);
+
+		add_settings_field(
+			'autocomplete_delay',
+			__( 'Autocomplete Delay', 'search-autocomplete' ),
+			array( $this, 'sa_settings_field_delay' ),
+			'search-autocomplete',
+			'sa_settings_main'
+		);
+
+//		add_settings_field(
+//			'autocomplete_position',
+//			__( 'Autocomplete Position', 'search-autocomplete ),
+//			array( $this, 'sa_settings_field_position' ),
+//			'search-autocomplete',
+//			'sa_settings_main'
+//		);
+
+		add_settings_field(
+			'autocomplete_autofocus',
+			__( 'Autofocus', 'search-autocomplete' ),
+			array( $this, 'sa_settings_field_autofocus' ),
+			'search-autocomplete',
+			'sa_settings_main'
+		);
+
 		add_settings_field(
 			'autocomplete_hotlinks',
 			__( 'Hotlink Items', 'search-autocomplete' ),
@@ -257,13 +299,6 @@ class SearchAutocomplete {
 			'search-autocomplete',
 			'sa_settings_main'
 		);
-//		add_settings_field(
-//			'autocomplete_exclusions',
-//			__( 'Excluded ', 'search-autocomplete' ),
-//			array( $this, 'sa_settings_field_exclusions' ),
-//			'search-autocomplete',
-//			'sa_settings_main'
-//		);
 		add_settings_field(
 			'autocomplete_sortorder',
 			__( 'Order of Types', 'search-autocomplete' ),
@@ -287,9 +322,10 @@ class SearchAutocomplete {
 		?>
 		<input id="autocomplete_search_id" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_search_id]" value="<?php echo htmlspecialchars( $this->options['autocomplete_search_id'] ); ?>">
 		<p class="description">
-			<?php _e( "Any valid CSS selector will work.", "search-autocomplete" ); ?><br>
-			<?php _e( "The default search box for TwentyTwelve, TwentyEleven, and TwentyTen is '#s'.", "search-autocomplete" ); ?><br>
-			<?php _e( "The default search box for TwentyThirteen is '[name=\"#s\"]'.", "search-autocomplete" ); ?>
+			<?php _e( 'Any valid CSS selector will work.', 'search-autocomplete' ); ?><br>
+			<?php _e( 'The default search box for TwentyTwelve, TwentyEleven, and TwentyTen is \'#s\'.', 'search-autocomplete' ); ?>
+			<br>
+			<?php _e( 'The default search box for TwentyThirteen is \'[name=\"#s\"]\'.', 'search-autocomplete' ); ?>
 		</p>
 	<?php
 	}
@@ -297,7 +333,7 @@ class SearchAutocomplete {
 	public function sa_settings_field_minimum() {
 		?>
 		<input id="autocomplete_minimum" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_minimum]" value="<?php echo $this->options['autocomplete_minimum']; ?>">
-		<p class="description"><?php _e( "The minimum number of characters before the autocomplete triggers.", "search-autocomplete" ); ?>
+		<p class="description"><?php _e( 'The minimum number of characters before the autocomplete triggers.', 'search-autocomplete' ); ?>
 		<br>
 	<?php
 	}
@@ -306,6 +342,42 @@ class SearchAutocomplete {
 		?>
 		<input id="autocomplete_numrows" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_numrows]" value="<?php echo $this->options['autocomplete_numrows']; ?>">
 		<p class="description"><?php _e( "The total number of results returned.", "search-autocomplete" ); ?><br>
+	<?php
+	}
+
+	public function sa_settings_field_delay() {
+		?>
+		<input id="autocomplete_delay" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_delay]" value="<?php echo $this->options['autocomplete_delay']; ?>">
+		<p class="description"><?php _e( 'The delay in milliseconds between when a keystroke occurs and when a search is performed.', self::$slug ); ?>
+		<br>
+	<?php
+	}
+
+	public function sa_settings_field_autofocus() {
+		?>
+		<select name="<?php echo self::$options_field; ?>[autocomplete_autofocus]" id="autocomplete_autofocus">
+			<option value="true"<?php selected( $this->options['autocomplete_autofocus'], 'true' ); ?>><?php _e( 'True', self::$slug ); ?></option>
+			<option value="false"<?php selected( $this->options['autocomplete_autofocus'], 'false' ); ?>><?php _e( 'False', self::$slug ); ?></option>
+		</select>
+		<p class="description"><?php _e( 'If set to true the first item will automatically be focused when the menu is shown.', self::$slug ); ?>
+		<br>
+	<?php
+	}
+
+	public function sa_settings_field_position() {
+		$position = explode( ' ', $this->options['autocomplete_position'] );
+		?>
+		<label for="autocomplete_position_vertical"><?php _e( 'Vertical Position', self::$slug ); ?></label>
+		<select name="autocomplete_position_vertical" id="autocomplete_position_vertical">
+			<option value="top" <?php selected( $position[0], 'top' ); ?>><?php _e( 'Top', self::$slug ); ?></option>
+			<option value="bottom" <?php selected( $position[0], 'bottom' ); ?>><?php _e( 'Bottom', self::$slug ); ?></option>
+		</select><br>
+		<label for="autocomplete_position_horizontal"><?php _e( 'Horizontal Position', self::$slug ); ?></label>
+		<select name="autocomplete_position_horizontal" id="autocomplete_position_horizontal">
+			<option value="left" <?php selected( $position[1], 'left' ); ?>><?php _e( 'Left', self::$slug ); ?></option>
+			<option value="right" <?php selected( $position[1], 'right' ); ?>><?php _e( 'Right', self::$slug ); ?></option>
+		</select><br>
+		<p class="description"><?php _e( '', self::$slug ); ?><br>
 	<?php
 	}
 
@@ -366,7 +438,7 @@ class SearchAutocomplete {
 		$globFilter = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . '*' . DIRECTORY_SEPARATOR . '*.css';
 
 		if ( $themeOptions = glob( $globFilter, GLOB_ERR ) ) {
-			array_unshift( $themeOptions, __( '--None--', 'search-autocomplete') );
+			array_unshift( $themeOptions, __( '--None--', 'search-autocomplete' ) );
 		} else {
 
 		}
@@ -375,7 +447,6 @@ class SearchAutocomplete {
 			<?php
 			foreach ( $themeOptions as $stylesheet ) {
 				$newSheet = str_replace( dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'css', '', $stylesheet );
-//				$newSheet = str_replace( '\\', '/', $newSheet );
 				printf( '<option value="%s"%s>%s</option>', $newSheet, ( $newSheet == $this->options['autocomplete_theme'] ) ? ' selected="selected"' : '', $newSheet );
 			}
 			?>
@@ -399,6 +470,7 @@ class SearchAutocomplete {
 
 	public function sa_settings_validate( $input ) {
 		$valid = wp_parse_args( $input, self::$options_default );
+
 		return $valid;
 	}
 
@@ -414,6 +486,7 @@ class SearchAutocomplete {
 		}
 	}
 }
+
 register_activation_hook( __FILE__, array( 'SearchAutocomplete', 'activate' ) );
 
 $SearchAutocomplete = new SearchAutocomplete();

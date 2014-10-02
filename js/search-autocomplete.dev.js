@@ -29,7 +29,9 @@
                     }
                 });
             },
+            delay: options.delay,
             minLength: options.minLength,
+            autoFocus: options.autoFocus === "true",
             search: function(event, ui) {
                 $(event.currentTarget).addClass("sa_searching");
             },
