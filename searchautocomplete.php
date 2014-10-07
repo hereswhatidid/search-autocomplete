@@ -4,7 +4,7 @@
 Plugin Name: Search Autocomplete
 Plugin URI: http://hereswhatidid.com/search-autocomplete/
 Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
-Version: 2.1.5
+Version: 2.1.6
 Author: Gabe Shackle
 Author URI: http://hereswhatidid.com
 License: GPLv2 or later
@@ -16,7 +16,7 @@ class SearchAutocomplete {
 	protected static $options_field_current_ver = '2.0';
 	protected static $slug = 'search-autocomplete';
 	protected static $options_default = array(
-		'autocomplete_search_id'          => '#s',
+		'autocomplete_search_id'          => '[name="s"]',
 		'autocomplete_minimum'            => 3,
 		'autocomplete_numrows'            => 10,
 		'autocomplete_hotlinks'           => array(),
@@ -30,11 +30,12 @@ class SearchAutocomplete {
 		'autocomplete_position'           => 'bottom left',
 		'autocomplete_delay'              => 500,
 		'autocomplete_autofocus'          => 'false',
+		'autocomplete_relevanssi'         => 'true',
 		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
 	protected static $options_init = array(
-		'autocomplete_search_id'          => '#s',
+		'autocomplete_search_id'          => '[name="s"]',
 		'autocomplete_minimum'            => 3,
 		'autocomplete_numrows'            => 10,
 		'autocomplete_hotlinks'           => array( 'posts', 'taxonomies' ),
@@ -48,6 +49,7 @@ class SearchAutocomplete {
 		'autocomplete_position'           => '',
 		'autocomplete_delay'              => 500,
 		'autocomplete_autofocus'          => 'false',
+		'autocomplete_relevanssi'         => 'true',
 		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
@@ -113,17 +115,25 @@ class SearchAutocomplete {
 	}
 
 	public function acCallback() {
-		global $wpdb;
+		global $wpdb, $query;
 		$resultsPosts = array();
 		$resultsTerms = array();
 		$term         = sanitize_text_field( $_GET['term'] );
 		if ( count( $this->options['autocomplete_posttypes'] ) > 0 ) {
-			$tempPosts = get_posts( array(
-				'suppress_filters' => false,
-				's'                => $term,
-				'numberposts'      => $this->options['autocomplete_numrows'],
-				'post_type'        => $this->options['autocomplete_posttypes'],
-			) );
+			if ( ( function_exists( 'relevanssi_do_query' ) && ( $this->options['autocomplete_relevanssi'] !== 'false' ) ) ) {
+				$query->query_vars['s']              = $term;
+				$query->query_vars['posts_per_page'] = $this->options['autocomplete_numrows'];
+				$query->query_vars['post_type']      = $this->options['autocomplete_posttypes'];
+				relevanssi_do_query( $query );
+				$tempPosts = $query->posts;
+			} else {
+				$tempPosts = get_posts( array(
+					'suppress_filters' => false,
+					's'                => $term,
+					'numberposts'      => $this->options['autocomplete_numrows'],
+					'post_type'        => $this->options['autocomplete_posttypes'],
+				) );
+			}
 			foreach ( $tempPosts as $post ) {
 				$tempObject = array(
 					'id'       => $post->ID,
@@ -279,6 +289,14 @@ class SearchAutocomplete {
 		);
 
 		add_settings_field(
+			'autocomplete_relevanssi',
+			__( 'Relevanssi', 'search-autocomplete' ),
+			array( $this, 'sa_settings_field_relevanssi' ),
+			'search-autocomplete',
+			'sa_settings_main'
+		);
+
+		add_settings_field(
 			'autocomplete_hotlinks',
 			__( 'Hotlink Items', 'search-autocomplete' ),
 			array( $this, 'sa_settings_field_hotlinks' ),
@@ -360,6 +378,26 @@ class SearchAutocomplete {
 			<option value="false"<?php selected( $this->options['autocomplete_autofocus'], 'false' ); ?>><?php _e( 'False', self::$slug ); ?></option>
 		</select>
 		<p class="description"><?php _e( 'If set to true the first item will automatically be focused when the menu is shown.', self::$slug ); ?>
+		<br>
+	<?php
+	}
+
+	public function sa_settings_field_relevanssi() {
+		if ( function_exists( 'relevanssi_do_query' ) ) {
+			$relevanssi_enabled = '';
+		} else {
+			$relevanssi_enabled = ' disabled="disabled"';
+		}
+		?>
+		<select<?php echo $relevanssi_enabled; ?> name="<?php echo self::$options_field; ?>[autocomplete_relevanssi]" id="autocomplete_relevanssi">
+			<option value="true"<?php selected( $this->options['autocomplete_relevanssi'], 'true' ); ?>><?php _e( 'True', self::$slug ); ?></option>
+			<option value="false"<?php selected( $this->options['autocomplete_relevanssi'], 'false' ); ?>><?php _e( 'False', self::$slug ); ?></option>
+		</select>
+		<p class="description"><?php _e( 'Use Relevanssi search results (when plugin is enabled).', self::$slug ); ?></p>
+		<?php if ( ! function_exists( 'relevanssi_do_query' ) ) { ?>
+			<p class="description"><strong><?php _e( 'Relevanssi appears to be disabled.', self::$slug ); ?></strong></p>
+		<?php } ?>
+
 		<br>
 	<?php
 	}
