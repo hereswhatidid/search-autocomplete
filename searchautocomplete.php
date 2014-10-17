@@ -347,9 +347,9 @@ class SearchAutocomplete {
 		<input id="autocomplete_search_id" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_search_id]" value="<?php echo htmlspecialchars( $this->options['autocomplete_search_id'] ); ?>">
 		<p class="description">
 			<?php _e( 'Any valid CSS selector will work.', 'search-autocomplete' ); ?><br>
-			<?php _e( 'The default search box for TwentyTwelve, TwentyEleven, and TwentyTen is \'#s\'.', 'search-autocomplete' ); ?>
+			<?php _e( 'The default search box for TwentyTwelve, TwentyEleven, and TwentyTen is <code>#s</code>.', 'search-autocomplete' ); ?>
 			<br>
-			<?php _e( 'The default search box for TwentyThirteen is \'[name=\"#s\"]\'.', 'search-autocomplete' ); ?>
+			<?php _e( 'The default search box for TwentyThirteen is <code>[name="#s"]</code>', 'search-autocomplete' ); ?>
 		</p>
 	<?php
 	}
@@ -449,8 +449,8 @@ class SearchAutocomplete {
 		foreach ( $taxonomies as $taxonomy ) {
 			?>
 			<label>
-				<input name="<?= self::$options_field; ?>[autocomplete_taxonomies][]" class="autocomplete_taxonomies" id="autocomplete_taxonomies-<?= $taxonomy->name ?>" type="checkbox" value="<?= $taxonomy->name ?>" <?php checked( in_array( $taxonomy->name, $selectedTaxonomies ), true ); ?>>
-				<?= $taxonomy->labels->name ?></label><br>
+				<input name="<?php echo self::$options_field; ?>[autocomplete_taxonomies][]" class="autocomplete_taxonomies" id="autocomplete_taxonomies-<?php echo $taxonomy->name; ?>" type="checkbox" value="<?php echo $taxonomy->name; ?>" <?php checked( in_array( $taxonomy->name, $selectedTaxonomies ), true ); ?>>
+				<?php echo $taxonomy->labels->name; ?></label><br>
 		<?php
 		}
 		?></p>
@@ -469,8 +469,8 @@ class SearchAutocomplete {
 		foreach ( $postTypes as $postType ) {
 			?>
 			<label>
-				<input name="<?php echo self::$options_field; ?>[autocomplete_posttypes][]" class="autocomplete_posttypes" id="autocomplete_posttypes-<?php echo $postType->name ?>" type="checkbox" value="<?php echo $postType->name ?>" <?php checked( in_array( $postType->name, $selectedTypes ), true ); ?>>
-				<?php echo $postType->labels->name ?></label><br>
+				<input name="<?php echo self::$options_field; ?>[autocomplete_posttypes][]" class="autocomplete_posttypes" id="autocomplete_posttypes-<?php echo $postType->name; ?>" type="checkbox" value="<?php echo $postType->name; ?>" <?php checked( in_array( $postType->name, $selectedTypes ), true ); ?>>
+				<?php echo $postType->labels->name; ?></label><br>
 		<?php
 		}
 		?></p>
