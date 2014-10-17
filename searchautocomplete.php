@@ -60,10 +60,12 @@ class SearchAutocomplete {
 		$options;
 
 	public function __construct() {
+
 		$this->initVariables();
 		add_action( 'wp_enqueue_scripts', array( $this, 'initScripts' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'initAdminScripts' ) );
 		$this->initAjax();
+
 		// init admin settings page
 		add_action( 'admin_menu', array( $this, 'adminSettingsMenu' ) );
 		add_action( 'admin_init', array( $this, 'adminSettingsInit' ) ); // Add admin init functions
@@ -79,26 +81,29 @@ class SearchAutocomplete {
 	}
 
 	public function initScripts() {
-		$localVars = array(
-			'ajaxurl'   => admin_url( 'admin-ajax.php' ),
-			'fieldName' => $this->options['autocomplete_search_id'],
-			'minLength' => $this->options['autocomplete_minimum'],
-			'delay' => $this->options['autocomplete_delay'],
-			'autoFocus' => $this->options['autocomplete_autofocus']
-		);
-		if ( $this->options['autocomplete_theme'] !== '--None--' ) {
-			wp_enqueue_style( 'SearchAutocomplete-theme', plugins_url( 'css' . $this->options['autocomplete_theme'], __FILE__ ), array(), '1.9.2' );
-		}
-		if ( wp_script_is( 'jquery-ui-autocomplete', 'registered' ) ) {
-			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete' . $this->script_mode . '.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
-		} else {
-			wp_register_script( 'jquery-ui-autocomplete', plugins_url( 'js/jquery-ui-1.9.2.custom.min.js', __FILE__ ), array( 'jquery-ui' ), '1.9.2', true );
-			wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
-		}
+		$disable_frontscripts = apply_filters( 'search_autocomplete_disable_frontscripts', false );
+		if ( false === $disable_frontscripts ) {
+			$localVars = array(
+				'ajaxurl'   => admin_url( 'admin-ajax.php' ),
+				'fieldName' => $this->options['autocomplete_search_id'],
+				'minLength' => $this->options['autocomplete_minimum'],
+				'delay'     => $this->options['autocomplete_delay'],
+				'autoFocus' => $this->options['autocomplete_autofocus']
+			);
+			if ( $this->options['autocomplete_theme'] !== '--None--' ) {
+				wp_enqueue_style( 'SearchAutocomplete-theme', plugins_url( 'css' . $this->options['autocomplete_theme'], __FILE__ ), array(), '1.9.2' );
+			}
+			if ( wp_script_is( 'jquery-ui-autocomplete', 'registered' ) ) {
+				wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete' . $this->script_mode . '.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			} else {
+				wp_register_script( 'jquery-ui-autocomplete', plugins_url( 'js/jquery-ui-1.9.2.custom.min.js', __FILE__ ), array( 'jquery-ui' ), '1.9.2', true );
+				wp_enqueue_script( 'SearchAutocomplete', plugins_url( 'js/search-autocomplete.min.js', __FILE__ ), array( 'jquery-ui-autocomplete' ), '1.0.0', true );
+			}
 
-		$localVars = apply_filters( 'search_autocomplete_settings', $localVars );
+			$localVars = apply_filters( 'search_autocomplete_settings', $localVars );
 
-		wp_localize_script( 'SearchAutocomplete', 'SearchAutocomplete', $localVars );
+			wp_localize_script( 'SearchAutocomplete', 'SearchAutocomplete', $localVars );
+		}
 	}
 
 	public function initAdminScripts() {
@@ -115,7 +120,8 @@ class SearchAutocomplete {
 	}
 
 	public function acCallback() {
-		global $wpdb, $query;
+		global $wpdb,
+		       $query;
 		$resultsPosts = array();
 		$resultsTerms = array();
 		$term         = sanitize_text_field( $_GET['term'] );
@@ -341,9 +347,9 @@ class SearchAutocomplete {
 		<input id="autocomplete_search_id" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_search_id]" value="<?php echo htmlspecialchars( $this->options['autocomplete_search_id'] ); ?>">
 		<p class="description">
 			<?php _e( 'Any valid CSS selector will work.', 'search-autocomplete' ); ?><br>
-			<?php _e( 'The default search box for TwentyTwelve, TwentyEleven, and TwentyTen is \'#s\'.', 'search-autocomplete' ); ?>
+			<?php _e( 'The default search box for TwentyTwelve, TwentyEleven, and TwentyTen is <code>#s</code>.', 'search-autocomplete' ); ?>
 			<br>
-			<?php _e( 'The default search box for TwentyThirteen is \'[name=\"#s\"]\'.', 'search-autocomplete' ); ?>
+			<?php _e( 'The default search box for TwentyThirteen is <code>[name="#s"]</code>', 'search-autocomplete' ); ?>
 		</p>
 	<?php
 	}
@@ -443,8 +449,8 @@ class SearchAutocomplete {
 		foreach ( $taxonomies as $taxonomy ) {
 			?>
 			<label>
-				<input name="<?= self::$options_field; ?>[autocomplete_taxonomies][]" class="autocomplete_taxonomies" id="autocomplete_taxonomies-<?= $taxonomy->name ?>" type="checkbox" value="<?= $taxonomy->name ?>" <?php checked( in_array( $taxonomy->name, $selectedTaxonomies ), true ); ?>>
-				<?= $taxonomy->labels->name ?></label><br>
+				<input name="<?php echo self::$options_field; ?>[autocomplete_taxonomies][]" class="autocomplete_taxonomies" id="autocomplete_taxonomies-<?php echo $taxonomy->name; ?>" type="checkbox" value="<?php echo $taxonomy->name; ?>" <?php checked( in_array( $taxonomy->name, $selectedTaxonomies ), true ); ?>>
+				<?php echo $taxonomy->labels->name; ?></label><br>
 		<?php
 		}
 		?></p>
@@ -463,8 +469,8 @@ class SearchAutocomplete {
 		foreach ( $postTypes as $postType ) {
 			?>
 			<label>
-				<input name="<?php echo self::$options_field; ?>[autocomplete_posttypes][]" class="autocomplete_posttypes" id="autocomplete_posttypes-<?php echo $postType->name ?>" type="checkbox" value="<?php echo $postType->name ?>" <?php checked( in_array( $postType->name, $selectedTypes ), true ); ?>>
-				<?php echo $postType->labels->name ?></label><br>
+				<input name="<?php echo self::$options_field; ?>[autocomplete_posttypes][]" class="autocomplete_posttypes" id="autocomplete_posttypes-<?php echo $postType->name; ?>" type="checkbox" value="<?php echo $postType->name; ?>" <?php checked( in_array( $postType->name, $selectedTypes ), true ); ?>>
+				<?php echo $postType->labels->name; ?></label><br>
 		<?php
 		}
 		?></p>
