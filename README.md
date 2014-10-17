@@ -46,6 +46,10 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.7 - 17 Oct 2014
+* Fixed typo in default document selectors text
+* Removed short tag methods on the taxonomies list
+
 #### 2.1.6 - 6 Oct 2014
 * Added support for Relevanssi search plugin
 * Changed default selector to match newer core themes
