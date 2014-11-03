@@ -46,6 +46,9 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.11 - 3 Nov 2014
+* removed extra line break at beginning of plugin file
+
 #### 2.1.10 - 31 Oct 2014
 * ticked version to update repo
 
