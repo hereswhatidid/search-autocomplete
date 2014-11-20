@@ -3,8 +3,8 @@ Contributors: hereswhatidid
 Donate link: http://hereswhatidid.com/contact/
 Tags: jquery autocomplete, jquery ui, themeroller, search, autocomplete, ajax
 Requires at least: 3.x
-Tested up to: 4.0.0
-Stable tag: 2.1.11
+Tested up to: 4.0.1
+Stable tag: 2.1.12
 
 SearchAutocomplete implements the jQuery UI Autocomplete functionality on your Wordpress installation. 
 
@@ -56,6 +56,10 @@ Yes, but it's recommended that you create a copy of the theme that you are going
 Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for support. Thanks!
 
 == Change log ==
+
+= 2.1.12 - 20 Nov 2014
+* added id parameter to 'the_title' filter calls
+* fixed bug with Relevanssi when logged in as admin
 
 = 2.1.11 - 3 Nov 2014
 * removed extra line break at beginning of plugin file

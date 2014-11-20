@@ -3,7 +3,7 @@
 Plugin Name: Search Autocomplete
 Plugin URI: http://hereswhatidid.com/search-autocomplete/
 Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
-Version: 2.1.11
+Version: 2.1.12
 Author: Gabe Shackle
 Author URI: http://hereswhatidid.com
 License: GPLv2 or later
@@ -120,7 +120,8 @@ class SearchAutocomplete {
 
 	public function acCallback() {
 		global $wpdb,
-		       $query;
+		       $query,
+				$wp_query;
 		$resultsPosts = array();
 		$resultsTerms = array();
 		$term         = sanitize_text_field( $_GET['term'] );
@@ -129,6 +130,8 @@ class SearchAutocomplete {
 				$query->query_vars['s']              = $term;
 				$query->query_vars['posts_per_page'] = $this->options['autocomplete_numrows'];
 				$query->query_vars['post_type']      = $this->options['autocomplete_posttypes'];
+				$query->query_vars['paged'] = 0;
+				$query->is_admin = $wp_query->is_admin;
 				relevanssi_do_query( $query );
 				$tempPosts = $query->posts;
 			} else {
@@ -146,7 +149,7 @@ class SearchAutocomplete {
 					'taxonomy' => null,
 					'postType' => $post->post_type
 				);
-				$linkTitle  = apply_filters( 'the_title', $post->post_title );
+				$linkTitle  = apply_filters( 'the_title', $post->post_title, $post->ID );
 				$linkTitle  = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
 				if ( ! in_array( 'posts', $this->options['autocomplete_hotlinks'] ) ) {
 					$linkURL = '#';
@@ -176,7 +179,7 @@ class SearchAutocomplete {
 					'taxonomy' => $term->taxonomy,
 					'postType' => null
 				);
-				$linkTitle  = apply_filters( 'the_title', $term->post_title );
+				$linkTitle  = $term->post_title;
 				$linkTitle  = apply_filters( 'search_autocomplete_modify_title', $linkTitle, $tempObject );
 				if ( ! in_array( 'taxonomies', $this->options['autocomplete_hotlinks'] ) ) {
 					$linkURL = '#';

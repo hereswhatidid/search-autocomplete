@@ -46,6 +46,10 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.12 - 20 Nov 2014
+* added id parameter to 'the_title' filter calls
+* fixed bug with Relevanssi when logged in as admin
+
 #### 2.1.11 - 3 Nov 2014
 * removed extra line break at beginning of plugin file
 
