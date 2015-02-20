@@ -3,8 +3,8 @@ Contributors: hereswhatidid
 Donate link: http://hereswhatidid.com/contact/
 Tags: jquery autocomplete, jquery ui, themeroller, search, autocomplete, ajax
 Requires at least: 3.x
-Tested up to: 4.0.1
-Stable tag: 2.1.12
+Tested up to: 4.1.1
+Stable tag: 2.1.14
 
 SearchAutocomplete implements the jQuery UI Autocomplete functionality on your Wordpress installation. 
 
@@ -58,7 +58,8 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 == Change log ==
 
 = 2.1.14 - 18 Feb 2015
-
+* added Aristo theme to defaults
+* fixed bug with special characters in titles
 
 = 2.1.12 - 20 Nov 2014
 * added id parameter to 'the_title' filter calls, props to Ekin Hazal Bayar

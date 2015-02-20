@@ -30,7 +30,7 @@ class SearchAutocomplete {
 		'autocomplete_delay'              => 500,
 		'autocomplete_autofocus'          => 'false',
 		'autocomplete_relevanssi'         => 'true',
-		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
+		'autocomplete_theme'              => '/aristo/jquery-ui-aristo.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
 	protected static $options_init = array(
@@ -49,7 +49,7 @@ class SearchAutocomplete {
 		'autocomplete_delay'              => 500,
 		'autocomplete_autofocus'          => 'false',
 		'autocomplete_relevanssi'         => 'true',
-		'autocomplete_theme'              => '/redmond/jquery-ui-1.9.2.custom.min.css',
+		'autocomplete_theme'              => '/aristo/jquery-ui-aristo.min.css',
 		'autocomplete_custom_theme'       => '',
 	);
 
