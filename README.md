@@ -46,6 +46,8 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.14 - 19 Feb 2015
+
 #### 2.1.12 - 20 Nov 2014
 * added id parameter to 'the_title' filter calls, props to Ekin Hazal Bayar
 * fixed bug with Relevanssi when logged in as admin
