@@ -198,6 +198,11 @@ class SearchAutocomplete {
 		} else {
 			$results = array_merge( $resultsTerms, $resultsPosts );
 		}
+
+		foreach( $results as $index => $result ) {
+			$results[$index]['title'] = htmlspecialchars_decode( $result['title'] );
+		}
+
 		$results = apply_filters( 'search_autocomplete_modify_results', $results );
 		echo json_encode( array( 'results' => array_slice( $results, 0, $this->options['autocomplete_numrows'] ) ) );
 		die();
