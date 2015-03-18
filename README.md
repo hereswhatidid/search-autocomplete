@@ -46,6 +46,9 @@ Please <a href="http://hereswhatidid.com/contact/">contact the author</a> for su
 
 ### Change log
 
+#### 2.1.15 - 17 Mar 2015
+* fixed bug with special characters in titles - Props Kramer
+
 #### 2.1.14 - 19 Feb 2015
 * added Aristo theme to defaults
 * fixed bug with special characters in titles
