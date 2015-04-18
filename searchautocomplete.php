@@ -3,7 +3,7 @@
 Plugin Name: Search Autocomplete
 Plugin URI: http://hereswhatidid.com/search-autocomplete/
 Description: Adds jQuery Autocomplete functionality to the default WordPress search box.
-Version: 2.1.15
+Version: 2.1.16
 Author: Gabe Shackle
 Author URI: http://hereswhatidid.com
 License: GPLv2 or later
@@ -130,6 +130,7 @@ class SearchAutocomplete {
 				$query->query_vars['s']              = $term;
 				$query->query_vars['posts_per_page'] = $this->options['autocomplete_numrows'];
 				$query->query_vars['post_type']      = $this->options['autocomplete_posttypes'];
+				$query->query_vars['post_status']    = 'publish';
 				$query->query_vars['paged'] = 0;
 				$query->is_admin = $wp_query->is_admin;
 				relevanssi_do_query( $query );
