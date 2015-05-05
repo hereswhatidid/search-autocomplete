@@ -16,6 +16,7 @@ class SearchAutocomplete {
 	protected static $slug = 'search-autocomplete';
 	protected static $options_default = array(
 		'autocomplete_search_id'          => '[name="s"]',
+		'autocomplete_search_parent'      => '',
 		'autocomplete_minimum'            => 3,
 		'autocomplete_numrows'            => 10,
 		'autocomplete_hotlinks'           => array(),
@@ -35,6 +36,7 @@ class SearchAutocomplete {
 	);
 	protected static $options_init = array(
 		'autocomplete_search_id'          => '[name="s"]',
+		'autocomplete_search_parent'      => '',
 		'autocomplete_minimum'            => 3,
 		'autocomplete_numrows'            => 10,
 		'autocomplete_hotlinks'           => array( 'posts', 'taxonomies' ),
@@ -85,6 +87,7 @@ class SearchAutocomplete {
 			$localVars = array(
 				'ajaxurl'   => admin_url( 'admin-ajax.php' ),
 				'fieldName' => $this->options['autocomplete_search_id'],
+				'inputParent' => $this->options['autocomplete_search_parent'],
 				'minLength' => $this->options['autocomplete_minimum'],
 				'delay'     => $this->options['autocomplete_delay'],
 				'autoFocus' => $this->options['autocomplete_autofocus']
@@ -264,6 +267,13 @@ class SearchAutocomplete {
 			'sa_settings_main'
 		);
 		add_settings_field(
+			'autocomplete_search_parent',
+			__( 'Search Field Parent', 'search-autocomplete' ),
+			array( $this, 'sa_settings_field_parent' ),
+			'search-autocomplete',
+			'sa_settings_main'
+		);
+		add_settings_field(
 			'autocomplete_minimum',
 			__( 'Autocomplete Trigger', 'search-autocomplete' ),
 			array( $this, 'sa_settings_field_minimum' ),
@@ -361,6 +371,17 @@ class SearchAutocomplete {
 		</p>
 	<?php
 	}
+	
+	public function sa_settings_field_parent() {
+		?>
+		<input id="autocomplete_search_parent" class="regular-text" name="<?php echo self::$options_field; ?>[autocomplete_search_parent]" value="<?php echo htmlspecialchars( $this->options['autocomplete_search_parent'] ); ?>">
+		<p class="description">
+			<?php _e( 'Enter the selector you wish to append the results to. (Optional)', 'search-autocomplete' ); ?><br>
+			<?php _e( 'The default search box for TwentyTwelve, TwentyEleven, and TwentyTen is <code>.search-form</code>.', 'search-autocomplete' ); ?>
+		</p>
+	<?php
+	}
+
 
 	public function sa_settings_field_minimum() {
 		?>

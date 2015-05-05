@@ -2,6 +2,7 @@
     $(function() {
         var options = $.extend({
             fieldName: "#s",
+            inputParent: "",
             maxRows: 10,
             minLength: 4
         }, SearchAutocomplete);
@@ -29,6 +30,7 @@
                     }
                 });
             },
+            appendTo: options.inputParent,
             delay: options.delay,
             minLength: options.minLength,
             autoFocus: options.autoFocus === "true",
