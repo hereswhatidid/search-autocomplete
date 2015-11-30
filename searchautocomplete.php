@@ -201,7 +201,8 @@ class SearchAutocomplete {
 		}
 
 		foreach( $results as $index => $result ) {
-			$results[$index]['title'] = html_entity_decode( $result['title'] );
+			//https://wordpress.org/support/topic/hyphen-showing-up-incorrectly-on-new-install jf 11/30/2015 fixed
+			$results[$index]['title'] = html_entity_decode(htmlspecialchars_decode( $result['title'] ),ENT_COMPAT, 'UTF-8');
 		}
 
 		$results = apply_filters( 'search_autocomplete_modify_results', $results );
